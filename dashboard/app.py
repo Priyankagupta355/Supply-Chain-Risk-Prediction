@@ -11,7 +11,13 @@ from dashboard.components.charts import (
     monthly_delivery_trend,
     regional_shipment_chart,
     shipping_mode_chart,
-    regional_late_delivery_chart
+    regional_late_delivery_chart,
+    delivery_performance_chart,
+    monthly_late_delivery_chart,
+    shipping_mode_performance_chart,
+    top_high_risk_regions_chart,
+    regional_delivery_comparison_chart,
+    regional_summary_table
 )
 
 
@@ -360,18 +366,42 @@ if selected_page == "Executive Overview":
 # DELIVERY ANALYTICS
 # --------------------------------------------------
 
-elif selected_page == "Delivery Analytics":
 
-    st.markdown("## Delivery Analytics")
+elif selected_page == "Regional Analysis":
 
-    col1, col2 = st.columns(2)
+    st.markdown("## Regional Analysis")
 
-    with col1:
-        delivery_status_chart(filtered_df)
+    st.caption(
+        "Explore shipment distribution and delivery risks across regions."
+    )
 
-    with col2:
-        monthly_delivery_trend(filtered_df)
+    st.markdown("### Regional Shipment Volume")
 
+    regional_shipment_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Regional Late Delivery Risk")
+
+    regional_late_delivery_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Top 10 High-Risk Regions")
+
+    top_high_risk_regions_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Regional Delivery Comparison")
+
+    regional_delivery_comparison_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Regional Performance Summary")
+
+    regional_summary_table(filtered_df)
 
 # --------------------------------------------------
 # REGIONAL ANALYSIS
