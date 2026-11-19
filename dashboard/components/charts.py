@@ -742,3 +742,258 @@ def shipping_mode_performance_chart(df):
         fig,
         use_container_width=True
     )
+
+
+# --------------------------------------------------
+# TOP 10 HIGH-RISK REGIONS
+# --------------------------------------------------
+
+def top_high_risk_regions_chart(df):
+
+    required_columns = [
+        "Order Region",
+        "Delivery Status"
+    ]
+
+    if not all(col in df.columns for col in required_columns):
+        st.warning("Required regional columns not found.")
+        return
+
+    data = df.copy()
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel", na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid shipment records available.")
+        return
+
+    data["Is Late"] = (
+        data["Delivery Status"] == "late delivery"
+    ).astype(int)
+
+    regional_data = (
+        data.groupby("Order Region")
+        .agg(
+            Total_Shipments=("Is Late", "count"),
+            Late_Shipments=("Is Late", "sum")
+        )
+        .reset_index()
+    )
+
+    regional_data["Late_Rate"] = (
+        regional_data["Late_Shipments"]
+        / regional_data["Total_Shipments"]
+        * 100
+    )
+
+    top_regions = (
+        regional_data
+        .sort_values("Late_Rate", ascending=False)
+        .head(10)
+        .sort_values("Late_Rate", ascending=True)
+    )
+
+    fig = px.bar(
+        top_regions,
+        x="Late_Rate",
+        y="Order Region",
+        orientation="h",
+        color="Late_Rate",
+        color_continuous_scale=[
+            "#F59E0B",
+            "#EF4444"
+        ],
+        text="Late_Rate",
+        hover_data=[
+            "Total_Shipments",
+            "Late_Shipments"
+        ]
+    )
+
+    fig.update_traces(
+        texttemplate="%{text:.2f}%",
+        textposition="outside"
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Top 10 High-Risk Regions",
+        height=500
+    )
+
+    fig.update_layout(
+        coloraxis_showscale=False
+    )
+
+    fig.update_xaxes(
+        title="Late Delivery Rate (%)",
+        ticksuffix="%"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# REGIONAL DELIVERY STATUS COMPARISON
+# --------------------------------------------------
+
+def regional_delivery_comparison_chart(df):
+
+    required_columns = [
+        "Order Region",
+        "Delivery Status"
+    ]
+
+    if not all(col in df.columns for col in required_columns):
+        st.warning("Required regional columns not found.")
+        return
+
+    data = df.copy()
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel", na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid shipment records available.")
+        return
+
+    regional_data = (
+        data.groupby(
+            ["Order Region", "Delivery Status"]
+        )
+        .size()
+        .reset_index(name="Shipments")
+    )
+
+    regional_data["Delivery Status"] = (
+        regional_data["Delivery Status"]
+        .str.title()
+    )
+
+    fig = px.bar(
+        regional_data,
+        x="Order Region",
+        y="Shipments",
+        color="Delivery Status",
+        barmode="group",
+        color_discrete_sequence=CHART_COLORS
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Regional Delivery Status Comparison",
+        height=500
+    )
+
+    fig.update_xaxes(
+        title="Region",
+        tickangle=-45
+    )
+
+    fig.update_yaxes(
+        title="Number of Shipments"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# REGIONAL KPI SUMMARY
+# --------------------------------------------------
+
+def regional_summary_table(df):
+
+    required_columns = [
+        "Order Region",
+        "Delivery Status"
+    ]
+
+    if not all(col in df.columns for col in required_columns):
+        st.warning("Required regional columns not found.")
+        return
+
+    data = df.copy()
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel", na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid shipment records available.")
+        return
+
+    data["Is Late"] = (
+        data["Delivery Status"] == "late delivery"
+    ).astype(int)
+
+    summary = (
+        data.groupby("Order Region")
+        .agg(
+            Total_Shipments=("Is Late", "count"),
+            Late_Shipments=("Is Late", "sum")
+        )
+        .reset_index()
+    )
+
+    summary["On_Time_or_Advance"] = (
+        summary["Total_Shipments"]
+        - summary["Late_Shipments"]
+    )
+
+    summary["Late_Rate"] = (
+        summary["Late_Shipments"]
+        / summary["Total_Shipments"]
+        * 100
+    )
+
+    summary = summary.sort_values(
+        "Late_Rate",
+        ascending=False
+    )
+
+    summary["Late_Rate"] = (
+        summary["Late_Rate"].round(2)
+    )
+
+    st.dataframe(
+        summary,
+        use_container_width=True,
+        hide_index=True
+    )
+
