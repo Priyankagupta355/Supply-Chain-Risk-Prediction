@@ -21,7 +21,11 @@ from dashboard.components.charts import (
     shipping_volume_chart,
     shipping_late_rate_chart,
     scheduled_days_chart,
-    shipping_performance_table
+    shipping_performance_table,
+    risk_distribution_chart,
+    risk_by_shipping_mode_chart,
+    risk_by_region_chart,
+    high_risk_shipment_table
 )
 
 
@@ -461,19 +465,93 @@ elif selected_page == "Shipping Analysis":
 # RISK INTELLIGENCE
 # --------------------------------------------------
 
+
 elif selected_page == "Risk Intelligence":
 
     st.markdown("## Risk Intelligence")
 
-    display_kpi_cards(
-        total_shipments=kpis["total"],
-        valid_deliveries=kpis["valid"],
-        late_deliveries=kpis["late"],
-        late_delivery_rate=kpis["late_rate"],
-        avg_scheduled_days=kpis["avg_scheduled_days"]
+    st.caption(
+        "Historical shipment risk patterns and risk distribution analysis."
     )
 
-    regional_late_delivery_chart(filtered_df)
+    # Risk overview
+    if "Late_delivery_risk" in filtered_df.columns:
+
+        risk_values = pd.to_numeric(
+            filtered_df["Late_delivery_risk"],
+            errors="coerce"
+        )
+
+        risk_values = risk_values[
+            risk_values.isin([0, 1])
+        ]
+
+        total_risk_records = len(risk_values)
+
+        high_risk_count = int(
+            (risk_values == 1).sum()
+        )
+
+        low_risk_count = int(
+            (risk_values == 0).sum()
+        )
+
+        high_risk_percentage = (
+            high_risk_count / total_risk_records * 100
+            if total_risk_records > 0
+            else 0
+        )
+
+        col1, col2, col3 = st.columns(3)
+
+        col1.metric(
+            "Total Risk Records",
+            f"{total_risk_records:,}"
+        )
+
+        col2.metric(
+            "High-Risk Shipments",
+            f"{high_risk_count:,}"
+        )
+
+        col3.metric(
+            "Historical Risk Rate",
+            f"{high_risk_percentage:.2f}%"
+        )
+
+    st.divider()
+
+    # Risk distribution
+    st.markdown("### Risk Distribution")
+
+    risk_distribution_chart(filtered_df)
+
+    st.divider()
+
+    # Shipping mode risk
+    st.markdown("### Risk by Shipping Mode")
+
+    risk_by_shipping_mode_chart(filtered_df)
+
+    st.divider()
+
+    # Regional risk
+    st.markdown("### Regional Risk Analysis")
+
+    risk_by_region_chart(filtered_df)
+
+    st.divider()
+
+    # High risk records
+    st.markdown("### High-Risk Shipment Details")
+
+    high_risk_shipment_table(filtered_df)
+
+    st.info(
+        "Note: These charts use the dataset's historical "
+        "Late_delivery_risk labels. They are not live model predictions."
+    )
+
 
 
 # --------------------------------------------------
