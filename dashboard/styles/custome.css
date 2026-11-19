@@ -1,0 +1,291 @@
+
+/* =========================================
+   SUPPLY CHAIN ANALYTICS - CUSTOM THEME
+   ========================================= */
+
+/* Main application */
+.stApp {
+    background-color: #0B1120;
+    color: #E5E7EB;
+}
+
+/* Main content area */
+.block-container {
+    padding: 2rem 2.5rem 3rem 2.5rem;
+    max-width: 1600px;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #111827;
+    border-right: 1px solid #263449;
+}
+
+[data-testid="stSidebar"] > div {
+    padding-top: 1.5rem;
+}
+
+[data-testid="stSidebar"] * {
+    color: #E5E7EB;
+}
+
+/* Sidebar radio navigation */
+[data-testid="stSidebar"] [role="radiogroup"] {
+    gap: 8px;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label {
+    background-color: #172338;
+    padding: 12px 14px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label:hover {
+    background-color: #263449;
+    border-color: #16A34A;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #F8FAFC !important;
+    font-weight: 700 !important;
+}
+
+h1 {
+    letter-spacing: -0.8px;
+}
+
+h2 {
+    margin-top: 1rem;
+}
+
+/* Paragraph and captions */
+p, label, .stCaption {
+    color: #CBD5E1;
+}
+
+/* KPI cards */
+.kpi-card {
+    background: linear-gradient(145deg, #172338, #1E293B);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px;
+    min-height: 125px;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    border-color: #16A34A;
+}
+
+.kpi-title {
+    color: #94A3B8;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.kpi-value {
+    color: #F8FAFC;
+    font-size: 27px;
+    font-weight: 750;
+    line-height: 1.3;
+}
+
+.kpi-delta {
+    color: #16A34A;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* Streamlit metric cards */
+[data-testid="stMetric"] {
+    background-color: #172338;
+    border: 1px solid #334155;
+    padding: 16px;
+    border-radius: 12px;
+}
+
+[data-testid="stMetricLabel"] {
+    color: #94A3B8 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #F8FAFC !important;
+}
+
+/* Dataframes and tables */
+[data-testid="stDataFrame"] {
+    border: 1px solid #334155;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Buttons */
+.stButton > button,
+.stDownloadButton > button {
+    background-color: #16A34A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+    background-color: #15803D;
+    color: #FFFFFF;
+    border: none;
+    transform: translateY(-1px);
+}
+
+/* Inputs and select boxes */
+.stTextInput input,
+.stNumberInput input,
+.stDateInput input,
+.stSelectbox div[data-baseweb="select"],
+.stMultiSelect div[data-baseweb="select"] {
+    background-color: #172338;
+    color: #F8FAFC;
+    border-color: #334155;
+    border-radius: 8px;
+}
+
+/* Sliders */
+.stSlider [data-baseweb="slider"] {
+    padding-top: 8px;
+}
+
+/* Dividers */
+hr {
+    border-color: #263449 !important;
+}
+
+/* Expanders */
+[data-testid="stExpander"] {
+    background-color: #172338;
+    border: 1px solid #334155;
+    border-radius: 10px;
+}
+
+/* Alerts */
+[data-testid="stAlert"] {
+    border-radius: 10px;
+}
+
+/* Plotly chart containers */
+[data-testid="stPlotlyChart"] {
+    background-color: #111827;
+    border: 1px solid #263449;
+    border-radius: 12px;
+    padding: 8px;
+}
+
+/* Header */
+.dashboard-header {
+    background: linear-gradient(110deg, #172338, #1E293B);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.header-title {
+    color: #F8FAFC;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 5px;
+}
+
+.header-subtitle {
+    color: #94A3B8;
+    font-size: 14px;
+}
+
+/* Hide Streamlit branding */
+#MainMenu {
+    visibility: hidden;
+}
+
+footer {
+    visibility: hidden;
+}
+
+/* Responsive tablet and mobile */
+@media screen and (max-width: 768px) {
+
+    .block-container {
+        padding: 1rem 0.8rem 2rem 0.8rem;
+    }
+
+    .dashboard-header {
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .header-title {
+        font-size: 24px;
+        line-height: 1.3;
+    }
+
+    .header-subtitle {
+        font-size: 12px;
+    }
+
+    .kpi-card {
+        padding: 14px;
+        min-height: 105px;
+    }
+
+    .kpi-value {
+        font-size: 21px;
+    }
+
+    h1 {
+        font-size: 25px !important;
+    }
+
+    h2 {
+        font-size: 21px !important;
+    }
+
+    h3 {
+        font-size: 17px !important;
+    }
+
+    [data-testid="stMetric"] {
+        padding: 12px;
+    }
+
+    [data-testid="stPlotlyChart"] {
+        padding: 3px;
+    }
+}
+
+/* Small mobile screens */
+@media screen and (max-width: 480px) {
+
+    .block-container {
+        padding: 0.7rem 0.5rem 1.5rem 0.5rem;
+    }
+
+    .header-title {
+        font-size: 21px;
+    }
+
+    .kpi-value {
+        font-size: 18px;
+    }
+
+    .stButton > button,
+    .stDownloadButton > button {
+        width: 100%;
+        font-size: 13px;
+    }
+}

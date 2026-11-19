@@ -43,6 +43,7 @@ st.set_page_config(
 )
 
 
+
 # --------------------------------------------------
 # PROJECT PATH
 # --------------------------------------------------
@@ -609,3 +610,19 @@ st.divider()
 st.caption(
     "Supply Chain Risk Prediction | Interactive Analytics Platform"
 )
+
+def load_custom_css():
+    css_path = Path(__file__).parent / "styles" / "custom.css"
+
+    if css_path.exists():
+        with open(css_path, "r", encoding="utf-8") as file:
+            st.markdown(
+                f"<style>{file.read()}</style>",
+                unsafe_allow_html=True
+            )
+
+
+load_custom_css()
+
+
+
