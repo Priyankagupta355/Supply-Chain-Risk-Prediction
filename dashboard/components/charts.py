@@ -1274,4 +1274,306 @@ def shipping_performance_table(df):
         hide_index=True
     )
 
+    
+# --------------------------------------------------
+# PREPARE RISK DATA
+# --------------------------------------------------
+
+def prepare_risk_data(df):
+
+    required_columns = ["Late_delivery_risk"]
+
+    if not all(col in df.columns for col in required_columns):
+        return None
+
+    data = df.copy()
+
+    data["Late_delivery_risk"] = pd.to_numeric(
+        data["Late_delivery_risk"],
+        errors="coerce"
+    )
+
+    data = data.dropna(
+        subset=["Late_delivery_risk"]
+    )
+
+    data = data[
+        data["Late_delivery_risk"].isin([0, 1])
+    ]
+
+    data["Risk Level"] = data["Late_delivery_risk"].map({
+        0: "Low Risk",
+        1: "High Risk"
+    })
+
+    return data
+
+
+# --------------------------------------------------
+# HIGH RISK VS LOW RISK DISTRIBUTION
+# --------------------------------------------------
+
+def risk_distribution_chart(df):
+
+    data = prepare_risk_data(df)
+
+    if data is None or data.empty:
+        st.warning("Risk data is not available.")
+        return
+
+    risk_summary = (
+        data["Risk Level"]
+        .value_counts()
+        .reset_index()
+    )
+
+    risk_summary.columns = [
+        "Risk Level",
+        "Shipments"
+    ]
+
+    fig = px.pie(
+        risk_summary,
+        names="Risk Level",
+        values="Shipments",
+        hole=0.55,
+        color="Risk Level",
+        color_discrete_map={
+            "High Risk": "#EF4444",
+            "Low Risk": "#16A34A"
+        }
+    )
+
+    fig.update_traces(
+        textposition="inside",
+        textinfo="percent+label",
+        hovertemplate=(
+            "<b>%{label}</b><br>"
+            "Shipments: %{value:,}<br>"
+            "Share: %{percent}"
+            "<extra></extra>"
+        )
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "High-Risk vs Low-Risk Shipments"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# RISK BY SHIPPING MODE
+# --------------------------------------------------
+
+def risk_by_shipping_mode_chart(df):
+
+    data = prepare_risk_data(df)
+
+    if data is None or data.empty:
+        st.warning("Risk data is not available.")
+        return
+
+    if "Shipping Mode" not in data.columns:
+        st.warning("Shipping Mode column not found.")
+        return
+
+    summary = (
+        data.groupby("Shipping Mode")
+        .agg(
+            Total_Shipments=("Late_delivery_risk", "count"),
+            High_Risk_Shipments=("Late_delivery_risk", "sum")
+        )
+        .reset_index()
+    )
+
+    summary["Risk_Rate"] = (
+        summary["High_Risk_Shipments"]
+        / summary["Total_Shipments"]
+        * 100
+    )
+
+    summary = summary.sort_values(
+        "Risk_Rate",
+        ascending=False
+    )
+
+    fig = px.bar(
+        summary,
+        x="Shipping Mode",
+        y="Risk_Rate",
+        color="Risk_Rate",
+        color_continuous_scale=[
+            "#16A34A",
+            "#F59E0B",
+            "#EF4444"
+        ],
+        text="Risk_Rate",
+        hover_data=[
+            "Total_Shipments",
+            "High_Risk_Shipments"
+        ]
+    )
+
+    fig.update_traces(
+        texttemplate="%{text:.2f}%",
+        textposition="outside"
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Historical Risk Rate by Shipping Mode"
+    )
+
+    fig.update_layout(
+        coloraxis_showscale=False
+    )
+
+    fig.update_yaxes(
+        title="High-Risk Shipment Rate (%)",
+        ticksuffix="%"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# RISK BY REGION
+# --------------------------------------------------
+
+def risk_by_region_chart(df):
+
+    data = prepare_risk_data(df)
+
+    if data is None or data.empty:
+        st.warning("Risk data is not available.")
+        return
+
+    if "Order Region" not in data.columns:
+        st.warning("Order Region column not found.")
+        return
+
+    summary = (
+        data.groupby("Order Region")
+        .agg(
+            Total_Shipments=("Late_delivery_risk", "count"),
+            High_Risk_Shipments=("Late_delivery_risk", "sum")
+        )
+        .reset_index()
+    )
+
+    summary["Risk_Rate"] = (
+        summary["High_Risk_Shipments"]
+        / summary["Total_Shipments"]
+        * 100
+    )
+
+    summary = summary.sort_values(
+        "Risk_Rate",
+        ascending=True
+    )
+
+    fig = px.bar(
+        summary,
+        x="Risk_Rate",
+        y="Order Region",
+        orientation="h",
+        color="Risk_Rate",
+        color_continuous_scale=[
+            "#16A34A",
+            "#F59E0B",
+            "#EF4444"
+        ],
+        hover_data=[
+            "Total_Shipments",
+            "High_Risk_Shipments"
+        ]
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Historical Risk Rate by Region",
+        height=550
+    )
+
+    fig.update_layout(
+        coloraxis_showscale=False
+    )
+
+    fig.update_xaxes(
+        title="High-Risk Shipment Rate (%)",
+        ticksuffix="%"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# HIGH RISK SHIPMENT DETAILS
+# --------------------------------------------------
+
+def high_risk_shipment_table(df):
+
+    data = prepare_risk_data(df)
+
+    if data is None or data.empty:
+        st.warning("Risk data is not available.")
+        return
+
+    high_risk = data[
+        data["Late_delivery_risk"] == 1
+    ].copy()
+
+    display_columns = [
+        "Order Id",
+        "Shipping Mode",
+        "Order Region",
+        "Market",
+        "Customer Segment",
+        "Days for shipment (scheduled)",
+        "Late_delivery_risk"
+    ]
+
+    available_columns = [
+        col for col in display_columns
+        if col in high_risk.columns
+    ]
+
+    if not available_columns:
+        st.warning("No shipment detail columns available.")
+        return
+
+    st.write(
+        f"High-risk shipments found: {len(high_risk):,}"
+    )
+
+    st.dataframe(
+        high_risk[available_columns].head(100),
+        use_container_width=True,
+        hide_index=True
+    )
+
+    csv_data = high_risk[available_columns].to_csv(
+        index=False
+    ).encode("utf-8")
+
+    st.download_button(
+        label="Download High-Risk Shipments",
+        data=csv_data,
+        file_name="high_risk_shipments.csv",
+        mime="text/csv"
+    )
+
+
+
 
