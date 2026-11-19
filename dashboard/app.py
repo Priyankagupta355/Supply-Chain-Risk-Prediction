@@ -6,6 +6,14 @@ from pathlib import Path
 from dashboard.components.filters import apply_global_filters
 from dashboard.components.kpi_cards import display_kpi_cards
 
+from dashboard.components.charts import (
+    delivery_status_chart,
+    monthly_delivery_trend,
+    regional_shipment_chart,
+    shipping_mode_chart,
+    regional_late_delivery_chart
+)
+
 
 # --------------------------------------------------
 # PAGE CONFIG
@@ -34,7 +42,7 @@ DATA_PATH = (
 
 
 # --------------------------------------------------
-# CUSTOM HTML RENDERER
+# HTML RENDERER
 # --------------------------------------------------
 
 def render_html(html):
@@ -55,9 +63,11 @@ def load_dashboard_data():
 
 try:
     df = load_dashboard_data()
+
 except FileNotFoundError:
     st.error(f"Dataset not found: {DATA_PATH}")
     st.stop()
+
 except Exception as error:
     st.error(f"Unable to load dataset: {error}")
     st.stop()
@@ -114,6 +124,13 @@ render_html("""
     margin: 20px 0 15px 0;
 }
 
+.chart-container {
+    background: #111827;
+    border: 1px solid #263449;
+    border-radius: 12px;
+    padding: 12px;
+}
+
 @media screen and (max-width: 768px) {
 
     .block-container {
@@ -166,15 +183,7 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown(
-        """
-        <div style="color:#94A3B8; font-size:12px;">
-            SUPPLY CHAIN RISK PREDICTION<br>
-            Analytics Dashboard
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.caption("SUPPLY CHAIN RISK PREDICTION")
 
 
 # --------------------------------------------------
@@ -218,9 +227,10 @@ def calculate_kpis(data):
             .str.lower()
         )
 
-        valid_mask = ~status.str.contains("cancel", na=False)
-
-        valid_df = data.loc[valid_mask]
+        valid_mask = ~status.str.contains(
+            "cancel",
+            na=False
+        )
 
         valid_status = status.loc[valid_mask]
 
@@ -228,19 +238,21 @@ def calculate_kpis(data):
             valid_status.eq("late delivery").sum()
         )
 
-        valid = len(valid_df)
+        valid = len(valid_status)
 
     else:
 
         valid = total
 
         if "Late_delivery_risk" in data.columns:
+
             late = int(
                 pd.to_numeric(
                     data["Late_delivery_risk"],
                     errors="coerce"
                 ).fillna(0).sum()
             )
+
         else:
             late = 0
 
@@ -287,7 +299,7 @@ if selected_page == "Executive Overview":
         unsafe_allow_html=True
     )
 
-    # Professional KPI Cards
+    # KPI CARDS
     display_kpi_cards(
         total_shipments=kpis["total"],
         valid_deliveries=kpis["valid"],
@@ -298,7 +310,45 @@ if selected_page == "Executive Overview":
 
     st.divider()
 
-    st.markdown("### Dataset Preview")
+    # ROW 1: DELIVERY STATUS + MONTHLY TREND
+
+    st.markdown("### Delivery Performance")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        delivery_status_chart(filtered_df)
+
+    with col2:
+        monthly_delivery_trend(filtered_df)
+
+    st.divider()
+
+    # ROW 2: REGIONAL + SHIPPING MODE
+
+    st.markdown("### Shipment Distribution")
+
+    col3, col4 = st.columns(2)
+
+    with col3:
+        regional_shipment_chart(filtered_df)
+
+    with col4:
+        shipping_mode_chart(filtered_df)
+
+    st.divider()
+
+    # ROW 3: LATE DELIVERY REGIONAL ANALYSIS
+
+    st.markdown("### Risk Performance")
+
+    regional_late_delivery_chart(filtered_df)
+
+    st.divider()
+
+    # DATA PREVIEW
+
+    st.markdown("### Recent Dataset Records")
 
     st.dataframe(
         filtered_df.head(10),
@@ -314,17 +364,13 @@ elif selected_page == "Delivery Analytics":
 
     st.markdown("## Delivery Analytics")
 
-    if "Delivery Status" in filtered_df.columns:
+    col1, col2 = st.columns(2)
 
-        delivery_counts = (
-            filtered_df["Delivery Status"]
-            .value_counts()
-        )
+    with col1:
+        delivery_status_chart(filtered_df)
 
-        st.bar_chart(delivery_counts)
-
-    else:
-        st.warning("Delivery Status column not found.")
+    with col2:
+        monthly_delivery_trend(filtered_df)
 
 
 # --------------------------------------------------
@@ -335,17 +381,9 @@ elif selected_page == "Regional Analysis":
 
     st.markdown("## Regional Analysis")
 
-    if "Order Region" in filtered_df.columns:
+    regional_shipment_chart(filtered_df)
 
-        regional_data = (
-            filtered_df["Order Region"]
-            .value_counts()
-        )
-
-        st.bar_chart(regional_data)
-
-    else:
-        st.warning("Order Region column not found.")
+    regional_late_delivery_chart(filtered_df)
 
 
 # --------------------------------------------------
@@ -356,17 +394,7 @@ elif selected_page == "Shipping Analysis":
 
     st.markdown("## Shipping Analysis")
 
-    if "Shipping Mode" in filtered_df.columns:
-
-        shipping_data = (
-            filtered_df["Shipping Mode"]
-            .value_counts()
-        )
-
-        st.bar_chart(shipping_data)
-
-    else:
-        st.warning("Shipping Mode column not found.")
+    shipping_mode_chart(filtered_df)
 
 
 # --------------------------------------------------
@@ -377,20 +405,15 @@ elif selected_page == "Risk Intelligence":
 
     st.markdown("## Risk Intelligence")
 
-    st.metric(
-        "Late Delivery Rate",
-        f"{kpis['late_rate']:.2f}%"
+    display_kpi_cards(
+        total_shipments=kpis["total"],
+        valid_deliveries=kpis["valid"],
+        late_deliveries=kpis["late"],
+        late_delivery_rate=kpis["late_rate"],
+        avg_scheduled_days=kpis["avg_scheduled_days"]
     )
 
-    st.metric(
-        "Late Shipments",
-        f"{kpis['late']:,}"
-    )
-
-    st.info(
-        "This section will contain detailed risk patterns "
-        "and model insights in upcoming steps."
-    )
+    regional_late_delivery_chart(filtered_df)
 
 
 # --------------------------------------------------
@@ -402,7 +425,7 @@ elif selected_page == "Ad-hoc Analysis":
     st.markdown("## Ad-hoc Analysis")
 
     st.info(
-        "Custom dimension and metric analysis will be added next."
+        "Custom dimension and metric analysis will be added in the next step."
     )
 
 
@@ -424,7 +447,9 @@ elif selected_page == "Data Explorer":
         height=500
     )
 
-    csv_data = filtered_df.to_csv(index=False).encode("utf-8")
+    csv_data = filtered_df.to_csv(
+        index=False
+    ).encode("utf-8")
 
     st.download_button(
         label="Download Filtered Dataset",
