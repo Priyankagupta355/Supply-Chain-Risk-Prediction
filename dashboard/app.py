@@ -17,7 +17,11 @@ from dashboard.components.charts import (
     shipping_mode_performance_chart,
     top_high_risk_regions_chart,
     regional_delivery_comparison_chart,
-    regional_summary_table
+    regional_summary_table,
+    shipping_volume_chart,
+    shipping_late_rate_chart,
+    scheduled_days_chart,
+    shipping_performance_table
 )
 
 
@@ -420,11 +424,37 @@ elif selected_page == "Regional Analysis":
 # SHIPPING ANALYSIS
 # --------------------------------------------------
 
+
 elif selected_page == "Shipping Analysis":
 
     st.markdown("## Shipping Analysis")
 
-    shipping_mode_chart(filtered_df)
+    st.caption(
+        "Analyze shipping methods, shipment volumes and delivery performance."
+    )
+
+    st.markdown("### Shipment Volume")
+
+    shipping_volume_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Late Delivery Rate")
+
+    shipping_late_rate_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Scheduled Shipping Days")
+
+    scheduled_days_chart(filtered_df)
+
+    st.divider()
+
+    st.markdown("### Shipping Performance Summary")
+
+    shipping_performance_table(filtered_df)
+
 
 
 # --------------------------------------------------
