@@ -27,6 +27,7 @@ from dashboard.components.charts import (
     risk_by_region_chart,
     high_risk_shipment_table
 )
+from dashboard.components.adhoc import render_adhoc_analysis
 
 
 # --------------------------------------------------
@@ -558,13 +559,17 @@ elif selected_page == "Risk Intelligence":
 # AD-HOC ANALYSIS
 # --------------------------------------------------
 
+
 elif selected_page == "Ad-hoc Analysis":
 
     st.markdown("## Ad-hoc Analysis")
 
-    st.info(
-        "Custom dimension and metric analysis will be added in the next step."
+    st.caption(
+        "Create custom reports and interactive visualizations "
+        "using your selected dataset dimensions and metrics."
     )
+
+    render_adhoc_analysis(filtered_df)
 
 
 # --------------------------------------------------
