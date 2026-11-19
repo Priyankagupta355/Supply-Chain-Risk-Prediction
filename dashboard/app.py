@@ -28,6 +28,7 @@ from dashboard.components.charts import (
     high_risk_shipment_table
 )
 from dashboard.components.adhoc import render_adhoc_analysis
+from dashboard.components.data_explorer import render_data_explorer
 
 
 # --------------------------------------------------
@@ -576,13 +577,10 @@ elif selected_page == "Ad-hoc Analysis":
 # DATA EXPLORER
 # --------------------------------------------------
 
+
 elif selected_page == "Data Explorer":
+    render_data_explorer(filtered_df)
 
-    st.markdown("## Data Explorer")
-
-    st.write(
-        f"Records available: {len(filtered_df):,}"
-    )
 
     st.dataframe(
         filtered_df,
