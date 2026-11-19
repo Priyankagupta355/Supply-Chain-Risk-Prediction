@@ -1,10 +1,32 @@
+
+# Data processing
 pandas
 numpy
+
+# Data visualization
 matplotlib
 seaborn
+plotly
+
+# Machine learning
 scikit-learn
 xgboost
-streamlit
-plotly
 shap
+
+# Dashboard
+streamlit
+altair
+
+# Excel export
+openpyxl
+
+# Model serialization
 joblib
+
+# Jupyter notebook
+jupyter
+ipykernel
+
+# Utilities
+scipy
+tqdm
