@@ -438,3 +438,307 @@ def regional_late_delivery_chart(df):
         fig,
         use_container_width=True
     )
+
+
+# --------------------------------------------------
+# DELIVERY PERFORMANCE BREAKDOWN
+# --------------------------------------------------
+
+def delivery_performance_chart(df):
+
+    if "Delivery Status" not in df.columns:
+        st.warning("Delivery Status column not found.")
+        return
+
+    data = df.copy()
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel",
+            na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid delivery records available.")
+        return
+
+    performance = (
+        data["Delivery Status"]
+        .value_counts()
+        .reset_index()
+    )
+
+    performance.columns = [
+        "Delivery Status",
+        "Shipments"
+    ]
+
+    fig = px.bar(
+        performance,
+        x="Delivery Status",
+        y="Shipments",
+        color="Delivery Status",
+        color_discrete_sequence=CHART_COLORS,
+        text="Shipments"
+    )
+
+    fig.update_traces(
+        texttemplate="%{text:,}",
+        textposition="outside",
+        hovertemplate=(
+            "<b>%{x}</b><br>"
+            "Shipments: %{y:,}"
+            "<extra></extra>"
+        )
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Delivery Performance Breakdown",
+        height=420
+    )
+
+    fig.update_layout(
+        showlegend=False
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# MONTHLY LATE DELIVERY RATE
+# --------------------------------------------------
+
+def monthly_late_delivery_chart(df):
+
+    date_column = "shipping date (DateOrders)"
+
+    required_columns = [
+        date_column,
+        "Delivery Status"
+    ]
+
+    if not all(
+        column in df.columns
+        for column in required_columns
+    ):
+        st.warning("Required delivery columns not found.")
+        return
+
+    data = df.copy()
+
+    data[date_column] = pd.to_datetime(
+        data[date_column],
+        errors="coerce"
+    )
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data.dropna(
+        subset=[date_column]
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel",
+            na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid delivery records available.")
+        return
+
+    data["Month"] = (
+        data[date_column]
+        .dt.to_period("M")
+        .astype(str)
+    )
+
+    data["Is Late"] = (
+        data["Delivery Status"] == "late delivery"
+    ).astype(int)
+
+    monthly_data = (
+        data.groupby("Month")
+        .agg(
+            Total_Shipments=("Is Late", "count"),
+            Late_Shipments=("Is Late", "sum")
+        )
+        .reset_index()
+    )
+
+    monthly_data["Late_Rate"] = (
+        monthly_data["Late_Shipments"]
+        / monthly_data["Total_Shipments"]
+        * 100
+    )
+
+    fig = px.line(
+        monthly_data,
+        x="Month",
+        y="Late_Rate",
+        markers=True,
+        color_discrete_sequence=["#EF4444"],
+        hover_data=[
+            "Total_Shipments",
+            "Late_Shipments"
+        ]
+    )
+
+    fig.update_traces(
+        line=dict(width=3),
+        marker=dict(size=8),
+        hovertemplate=(
+            "<b>%{x}</b><br>"
+            "Late Rate: %{y:.2f}%<br>"
+            "<extra></extra>"
+        )
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Monthly Late Delivery Rate",
+        height=420
+    )
+
+    fig.update_xaxes(
+        title="Month",
+        tickangle=-45
+    )
+
+    fig.update_yaxes(
+        title="Late Delivery Rate (%)",
+        ticksuffix="%"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
+
+
+# --------------------------------------------------
+# SHIPPING MODE DELIVERY PERFORMANCE
+# --------------------------------------------------
+
+def shipping_mode_performance_chart(df):
+
+    required_columns = [
+        "Shipping Mode",
+        "Delivery Status"
+    ]
+
+    if not all(
+        column in df.columns
+        for column in required_columns
+    ):
+        st.warning("Required shipping columns not found.")
+        return
+
+    data = df.copy()
+
+    data["Delivery Status"] = (
+        data["Delivery Status"]
+        .astype(str)
+        .str.strip()
+        .str.lower()
+    )
+
+    data = data[
+        ~data["Delivery Status"].str.contains(
+            "cancel",
+            na=False
+        )
+    ]
+
+    if data.empty:
+        st.info("No valid shipment records available.")
+        return
+
+    data["Is Late"] = (
+        data["Delivery Status"] == "late delivery"
+    ).astype(int)
+
+    shipping_data = (
+        data.groupby("Shipping Mode")
+        .agg(
+            Total_Shipments=("Is Late", "count"),
+            Late_Shipments=("Is Late", "sum")
+        )
+        .reset_index()
+    )
+
+    shipping_data["Late_Rate"] = (
+        shipping_data["Late_Shipments"]
+        / shipping_data["Total_Shipments"]
+        * 100
+    )
+
+    shipping_data = shipping_data.sort_values(
+        "Late_Rate",
+        ascending=False
+    )
+
+    fig = px.bar(
+        shipping_data,
+        x="Shipping Mode",
+        y="Late_Rate",
+        color="Late_Rate",
+        color_continuous_scale=[
+            "#16A34A",
+            "#F59E0B",
+            "#EF4444"
+        ],
+        text="Late_Rate",
+        hover_data=[
+            "Total_Shipments",
+            "Late_Shipments"
+        ]
+    )
+
+    fig.update_traces(
+        texttemplate="%{text:.2f}%",
+        textposition="outside",
+        hovertemplate=(
+            "<b>%{x}</b><br>"
+            "Late Rate: %{y:.2f}%"
+            "<extra></extra>"
+        )
+    )
+
+    fig = apply_chart_layout(
+        fig,
+        "Late Delivery Rate by Shipping Mode",
+        height=420
+    )
+
+    fig.update_layout(
+        coloraxis_showscale=False
+    )
+
+    fig.update_yaxes(
+        title="Late Delivery Rate (%)",
+        ticksuffix="%"
+    )
+
+    st.plotly_chart(
+        fig,
+        use_container_width=True
+    )
