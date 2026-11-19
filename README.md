@@ -1,268 +1,224 @@
+# 📦 Supply Chain Risk Prediction & Analytics
 
+An end-to-end Machine Learning and Interactive Analytics project designed to analyze historical supply chain operations and identify patterns associated with late deliveries.
 
-# Supply Chain Risk Prediction System
+The project combines data preprocessing, exploratory data analysis, machine learning, model evaluation, explainable AI, and an interactive Streamlit dashboard.
 
-An end-to-end Machine Learning project that analyzes
-supply chain delivery performance and predicts the risk
-of late shipments using historical shipment data.
+## 🚀 Project Overview
 
-## Project Overview
+Supply chain delays can affect customer satisfaction, logistics efficiency, and business performance.
 
-The Supply Chain Risk Prediction System helps analyze
-historical delivery patterns, identify shipment risk
-factors, and predict whether a shipment is likely to
-experience late delivery.
+This project analyzes historical shipment data to understand delivery performance, identify high-risk shipment patterns, and explore the factors associated with late deliveries.
 
-The project combines data analytics, SQL, machine
-learning, explainable AI, and an interactive Streamlit
-dashboard.
+It also provides an interactive analytics dashboard where users can explore shipment trends, regional performance, shipping modes, and delivery risks.
 
-## Problem Statement
+## ✨ Key Features
 
-Late deliveries can negatively affect customer
-satisfaction, logistics operations, and supply chain
-efficiency.
+### 1. Data Processing
 
-This project uses historical shipment information to:
+- Data cleaning and preprocessing
+- Missing value analysis
+- Duplicate record analysis
+- Feature selection
+- Data quality checks
 
-- Analyze delivery performance.
-- Identify high-risk shipping patterns.
-- Understand factors associated with late deliveries.
-- Predict potential late-delivery risk.
-- Present insights through an interactive dashboard.
+### 2. Exploratory Data Analysis
 
-## Dataset
+- Delivery status distribution
+- Regional shipment analysis
+- Shipping mode performance
+- Monthly delivery trends
+- Late delivery patterns
+
+### 3. Machine Learning
+
+- XGBoost classification model
+- Feature preprocessing pipeline
+- Categorical encoding
+- Numerical feature scaling
+- Group-based train, validation, and test splitting
+
+### 4. Model Evaluation
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+- Confusion matrix
+
+### 5. Explainable AI
+
+- SHAP feature importance
+- Model interpretation
+- Identification of influential shipment features
+
+### 6. Interactive Streamlit Dashboard
+
+- Executive Overview
+- Delivery Analytics
+- Regional Analysis
+- Shipping Analysis
+- Risk Intelligence
+- Ad-hoc Analysis
+- Data Explorer
+
+### 7. Data Exploration
+
+- Global filters
+- Search and sorting
+- Missing value analysis
+- Data quality summary
+- CSV and Excel export
+
+## 🛠️ Technology Stack
+
+| Category         | Technologies                |
+| ---------------- | --------------------------- |
+| Programming      | Python                      |
+| Data Processing  | Pandas, NumPy               |
+| Visualization    | Matplotlib, Seaborn, Plotly |
+| Machine Learning | Scikit-learn, XGBoost       |
+| Explainable AI   | SHAP                        |
+| Dashboard        | Streamlit                   |
+| Development      | Jupyter Notebook, VS Code   |
+| Version Control  | Git, GitHub                 |
+
+## 📊 Dataset
 
 **Dataset:** DataCo Smart Supply Chain Dataset
 
-**Source:** Kaggle
+The project uses historical supply chain records containing shipment, customer, order, product, and delivery information.
 
-https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis
+- Records: 180,519
+- Historical period: 2015–2018
+- Cleaned dataset: 180,519 records
+- Prediction target: Late delivery classification
 
-Dataset details:
+Note: The dataset represents historical operations and does not provide live shipment tracking.
 
-- Original records: 180,519
-- Cleaned records: 180,519
-- Historical data period: 2015–2018
-- Cleaned dataset columns: 51
+## 📈 Model Performance
 
-Canceled shipments were excluded from delivery
-prediction and evaluation.
-
-## Technologies Used
-
-### Programming
-
-- Python
-- SQL
-
-### Data Analysis
-
-- Pandas
-- NumPy
-- Matplotlib
-- Seaborn
-
-### Machine Learning
-
-- Scikit-learn
-- XGBoost
-
-### Explainable AI
-
-- SHAP
-
-### Dashboard
-
-- Streamlit
-- Plotly
-
-### Model Management
-
-- Joblib
-
-## Project Workflow
-
-1. Data Collection
-2. Data Cleaning
-3. Exploratory Data Analysis
-4. SQL-Based Analysis
-5. Feature Selection
-6. Feature Preprocessing
-7. Model Training
-8. Model Evaluation
-9. SHAP Explainability
-10. Interactive Dashboard Development
-
-## Machine Learning Model
-
-**Algorithm:** XGBoost Classifier
-
-Selected input features:
-
-- Shipping Mode
-- Days for shipment (scheduled)
-- Customer Segment
-- Market
-- Order Region
-- Department Name
-- Category Name
-- Order Item Quantity
-- Order Item Discount
-- Order Item Discount Rate
-- Order Item Product Price
-
-Target Variable:
-
-- 1 = Late Delivery
-- 0 = Not Late Delivery
-
-Canceled shipments are excluded from the modeling dataset.
-
-## Model Performance
-
-Evaluation was performed using a grouped test split
-to reduce data leakage between shipment orders.
+The evaluated XGBoost model achieved the following test results:
 
 | Metric    |  Score |
 | --------- | -----: |
 | Accuracy  | 64.61% |
 | Precision | 66.82% |
 | Recall    | 76.46% |
-| F1 Score  | 71.32% |
+| F1-Score  | 71.32% |
 | ROC-AUC   | 73.92% |
 
-Classification threshold: 0.40
+These results represent performance on the held-out test set using the selected classification threshold.
 
-## Explainable AI - SHAP
+The model is an experimental analytical model and requires further validation before production deployment.
 
-SHAP was used to understand the features influencing
-model predictions.
+## 🏗️ Project Structure
 
-Important features identified:
-
-1. Shipping Mode - First Class
-2. Scheduled Shipping Days
-3. Shipping Mode - Second Class
-4. Shipping Mode - Standard Class
-5. Order Item Discount
-
-SHAP importance represents model associations and
-does not establish causation.
-
-## Dashboard Modules
-
-The Streamlit dashboard contains four modules:
-
-### 1. Overview
-
-- Shipment KPIs
-- Delivery status distribution
-- Monthly delivery trends
-- Regional performance
-
-### 2. Delivery Analysis
-
-- Shipping mode analysis
-- Regional delivery performance
-- Customer segment analysis
-- Department-level insights
-- Interactive filters
-
-### 3. Risk Prediction
-
-- Shipment information input
-- Predicted late-delivery probability
-- High-risk and lower-risk classification
-- Operational recommendations
-
-### 4. Model Insights
-
-- Model evaluation metrics
-- Confusion matrix
-- SHAP feature importance
-- Prediction threshold analysis
-
-## Project Structure
-
+```text
 Supply_Chain_Risk_Prediction/
-│
-├── dashboard/
-│   ├── app.py
-│   ├── pages/
-│   │   ├── 1_Overview.py
-│   │   ├── 2_Delivery_Analysis.py
-│   │   ├── 3_Risk_Prediction.py
-│   │   └── 4_Model_Insights.py
-│   └── components/
-│       └── charts.py
 │
 ├── data/
 │   ├── raw/
-│   ├── processed/
-│   └── external/
-│
-├── models/
-│   ├── best_model.pkl
-│   └── preprocessor.pkl
+│   └── processed/
 │
 ├── notebooks/
-├── reports/
-├── sql/
+│
 ├── src/
+│   ├── data/
+│   ├── features/
+│   ├── models/
+│   └── visualization/
+│
+├── dashboard/
+│   ├── app.py
+│   ├── components/
+│   ├── pages/
+│   └── styles/
+│
+├── models/
+│   └── best_model.pkl
+│
+├── reports/
+│
 ├── tests/
+│
+├── requirements.txt
 ├── README.md
-└── requirements.txt
+└── .gitignore
+```
 
-## Installation and Setup
+## ⚙️ Installation & Setup
 
 ### 1. Clone the repository
 
-git clone YOUR_GITHUB_REPOSITORY_URL
+```bash
+git clone https://github.com/Priyankagupta355/Supply-Chain-Risk-Prediction.git
+```
 
 ### 2. Navigate to project directory
 
-cd Supply_Chain_Risk_Prediction
+```bash
+cd Supply-Chain-Risk-Prediction
+```
 
 ### 3. Create virtual environment
 
+```bash
 python -m venv venv
+```
 
-### 4. Activate virtual environment
+### 4. Activate environment
 
-Windows:
+Windows PowerShell:
 
-venv\Scripts\activate
+```powershell
+.\venv\Scripts\Activate.ps1
+```
 
 ### 5. Install dependencies
 
+```bash
 pip install -r requirements.txt
+```
 
-### 6. Run Streamlit dashboard
+### 6. Install Excel export dependency
 
+```bash
+pip install openpyxl
+```
+
+### 7. Run the dashboard
+
+```bash
 streamlit run dashboard/app.py
+```
 
-## Important Notes
+## 📌 Important Notes
 
-- The project uses historical shipment data from
-  2015–2018.
-- Predictions are based on learned historical patterns.
-- The model is a portfolio/research prototype and is
-  not validated for production deployment.
-- Model performance can vary on new operational data.
-- False positives and false negatives remain limitations.
+- The cleaned dataset and trained model must be available at their expected project paths.
+- Large dataset files may need to be downloaded separately.
+- Model performance is based on historical data.
+- SHAP explanations describe model behavior, not causal relationships.
+- The dashboard's historical risk indicators are not live predictions.
 
-## Future Improvements
+## 🔮 Future Improvements
 
-- Improve model performance through hyperparameter tuning.
-- Evaluate additional machine learning algorithms.
-- Add real-time shipment tracking integration.
-- Develop automated risk alerts.
-- Deploy the dashboard online.
-- Monitor model performance and data drift.
+- Real-time shipment data integration
+- Improved model generalization
+- Advanced risk monitoring
+- Automated model retraining
+- Deployment through a cloud platform
+- API integration for shipment risk analysis
 
-## Author
+## 👩‍💻 Author
 
-Priyanka Gupta
+**Priyanka Gupta**
 
-B.Tech - Artificial Intelligence and Data Science
+B.Tech – Artificial Intelligence & Data Science
+
+GitHub: [Priyankagupta355](https://github.com/Priyankagupta355)
+
+---
+
+⭐ If you find this project interesting, consider giving it a star!
